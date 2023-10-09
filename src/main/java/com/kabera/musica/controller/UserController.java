@@ -5,10 +5,7 @@ import com.kabera.musica.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
@@ -20,7 +17,16 @@ public class UserController {
         return "create";
     }
     @PostMapping("/signup")
-    public ResponseEntity<String> saveUser(@RequestBody User user){
+    public ResponseEntity<String> saveUser(@RequestParam("email") String email,
+                                           @RequestParam("username") String username,
+                                           @RequestParam("password") String password,
+                                           @RequestParam("role") String role){
+        User user = User.builder()
+                .email(email)
+                .username(username)
+                .password(password)
+                .role(role)
+                .build();
         userService.saveUser(user);
         return new ResponseEntity<>("Account created!", HttpStatus.CREATED);
     }

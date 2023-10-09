@@ -18,7 +18,7 @@ public class ArtistModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artist_id")
     private Integer artistId;
-    @Column(name = "artist_name")
+    @Column(name = "artist_name", unique = true)
     private String artistName;
     @Column(name = "artist_genre")
     private String artistGenre;

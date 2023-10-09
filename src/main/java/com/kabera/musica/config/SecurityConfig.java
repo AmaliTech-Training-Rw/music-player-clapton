@@ -27,7 +27,8 @@ public class SecurityConfig{
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/create-account").permitAll()
-                        .requestMatchers("/musica/pub/**").permitAll()
+                        .requestMatchers("/songs").permitAll()
+                        .requestMatchers("/create-song").permitAll()
                         .requestMatchers("/musica/artist/**").hasRole("ARTIST")
                         .anyRequest().authenticated()
                 )
