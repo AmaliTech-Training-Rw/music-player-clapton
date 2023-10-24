@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Musica - Songs</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  </head>
+  <body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Song</th>
+          <th>Title</th>
+          <th>Artist</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:if="${songList.empty}">
+          <td colspan="2">No songs avaliable!</td>
+        </tr>
+        <tr th:each="song : ${songList}">
+          <td>
+            <audio controls>
+              <source th:src="@{${song.songUrl}}" type="audio/mpeg">
+              Your browser does not support the audio element
+            </audio>
+          </td>
+          <td><span th:text="${song.songTitle}"></span></td>
+          <td th:each="artist : ${song.artists}">
+            <span th:text="${artist.artistName}"></span>
+            <span> | </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <a class="btn btn-success m-5" th:href="@{/pub/playlist}"><i class="bi bi-plus-lg"></i> Create Playlist</a>
+  </body>
+</html>

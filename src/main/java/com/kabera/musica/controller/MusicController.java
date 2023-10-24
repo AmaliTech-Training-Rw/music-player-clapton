@@ -1,29 +1,24 @@
 package com.kabera.musica.controller;
 
 import com.kabera.musica.model.MusicModel;
-import com.kabera.musica.repository.MusicRepository;
 import com.kabera.musica.service.ArtistService;
 import com.kabera.musica.service.MusicService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
+@RequestMapping("/pub")
 public class MusicController {
     @Value("${file.upload-dir}")
     private String songLocation;
@@ -56,26 +51,39 @@ public class MusicController {
     }
 
     @GetMapping("/songs")
-    public ResponseEntity<Resource> downloadFile(HttpServletRequest request) {
-        // Load file as Resource
-        Resource resource = musicService.loadFileAsResource();
+    public String getAllSongs(Model model) throws IOException {
+        model.addAttribute("songList", musicService.findAllSongs());
+        return "songs";
+    }
 
-        // Try to determine file's content type
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            System.out.println("Could not determine file type.");
+    @PutMapping("/song/update")
+    public ResponseEntity<?> updateSongDetails(@RequestParam Integer songId){
+        Optional<MusicModel> song = musicService.findSongById(songId);
+
+        if(song.isEmpty()){
+            return new ResponseEntity<>("The song requested for does not exist", HttpStatus.NOT_FOUND);
         }
 
-        // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
+        MusicModel songToUpdate = song.get();
+        musicService.saveSong(songToUpdate);
+        return new ResponseEntity<>("Song updated", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/song/delete")
+    public ResponseEntity<?> deleteSong(@RequestParam Integer songId){
+        Optional<MusicModel> song = musicService.findSongById(songId);
+
+        if(song.isEmpty()){
+            return new ResponseEntity<>("The song requested for does not exist", HttpStatus.NOT_FOUND);
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+        MusicModel songToDelete = song.get();
+        musicService.deleteSong(songToDelete);
+        return new ResponseEntity<>("Song deleted", HttpStatus.OK);
+    }
+
+    @GetMapping("/test")
+    public String getTestPage(){
+        return "test";
     }
 }

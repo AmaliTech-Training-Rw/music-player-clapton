@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MusicService {
@@ -42,6 +43,11 @@ public class MusicService {
     public String saveSong(MusicModel song, MultipartFile file){
         musicRepository.save(song);
         return "song saved successfully";
+    }
+
+    public String saveSong(MusicModel song){
+        musicRepository.save(song);
+        return "Song updated!";
     }
 
     public List<MusicModel> findAllSongs(){
@@ -85,5 +91,14 @@ public class MusicService {
             throw new MusicFileNotFoundException("File not found " + ex);
         }
         return null;
+    }
+
+    public Optional<MusicModel> findSongById(Integer songId) {
+        return musicRepository.findById(songId);
+    }
+
+    public String deleteSong(MusicModel songToDelete) {
+        musicRepository.delete(songToDelete);
+        return "Song deleted!";
     }
 }
